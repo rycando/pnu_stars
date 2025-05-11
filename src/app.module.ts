@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { CommentModule } from 'src/comment/comment.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Comment } from 'src/comment/comment.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -17,6 +19,9 @@ import { Comment } from 'src/comment/comment.entity';
       database: 'pnu_stars',
       entities: [Comment],
       synchronize: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'static'),
     }),
   ],
   controllers: [AppController],
