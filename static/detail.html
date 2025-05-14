@@ -2,125 +2,111 @@
 <html>
   <head>
     <link rel="stylesheet" href="pnu_stars.css" />
+    <script>
+      const API_BASE_URL = "http://localhost:3000";
+
+      async function fetchComments(placeName) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/comments?placeName=${encodeURIComponent(placeName)}`);
+          if (!response.ok) {
+            throw new Error("댓글 조회 실패");
+          }
+
+          const data = await response.json();
+          const commentsContainer = document.getElementById("comments-container");
+          commentsContainer.innerHTML = "";
+
+          if (data.comments.length === 0) {
+            commentsContainer.innerHTML = `<p>아직 댓글이 없습니다. 첫 댓글을 작성해보세요!</p>`;
+            return;
+          }
+
+          data.comments.forEach((comment) => {
+            const commentElement = document.createElement("div");
+            commentElement.className = "comment-item";
+            commentElement.innerHTML = `
+              <p><strong>${comment.placeName}</strong></p>
+              <p>${comment.content}</p>
+              <p class="text-sm text-gray-500">${new Date(comment.createdAt).toLocaleString()}</p>
+            `;
+            commentsContainer.appendChild(commentElement);
+          });
+        } catch (error) {
+          console.error(error);
+          document.getElementById("comments-container").innerHTML = `<p>댓글을 불러오는 중 오류가 발생했습니다.</p>`;
+        }
+      }
+
+      async function submitComment(event) {
+        event.preventDefault();
+        const placeName = new URLSearchParams(window.location.search).get("placeName");
+        const content = document.getElementById("comment-input").value;
+
+        if (!content.trim()) {
+          alert("댓글 내용을 입력해주세요.");
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/comments/${encodeURIComponent(placeName)}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ content }),
+          });
+
+          if (!response.ok) {
+            throw new Error("댓글 등록 실패");
+          }
+
+          document.getElementById("comment-input").value = "";
+          fetchComments(placeName);
+        } catch (error) {
+          console.error(error);
+          alert("댓글 등록 중 오류가 발생했습니다.");
+        }
+      }
+
+      window.onload = function () {
+        const placeName = new URLSearchParams(window.location.search).get("placeName");
+        if (!placeName) {
+          document.getElementById("comments-container").innerHTML = `<p>식당 정보를 찾을 수 없습니다.</p>`;
+          return;
+        }
+
+        fetchComments(placeName);
+      };
+    </script>
   </head>
   <body>
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
-        <a
-          href="/"
-          style="display: inline-flex; align-items: center; gap: 0.25rem"
-        >
-          <!-- <ArrowLeft className="h-4 w-4" /> -->
+    <div class="container mx-auto px-4 py-8">
+      <div class="mb-6">
+        <a href="index.html" style="display: inline-flex; align-items: center; gap: 0.25rem">
           <span>메인으로 돌아가기</span>
         </a>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-        <div className="h-full">
-          <div>
-            <h3 className="text-2xl">{restaurant.name}</h3>
-          </div>
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <Utensils className="h-5 w-5 mt-0.5 text-muted-foreground" />
-              <div>
-                <h3 className="font-medium">카테고리</h3>
-                <p>{restaurant.category}</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <MapPin className="h-5 w-5 mt-0.5 text-muted-foreground" />
-              <div>
-                <h3 className="font-medium">주소</h3>
-                <p>{restaurant.address}</p>
-              </div>
-            </div>
-
-            {restaurant.links && restaurant.links.length > 0 && (
-            <div className="flex items-start gap-3">
-              <LinkIcon className="h-5 w-5 mt-0.5 text-muted-foreground" />
-              <div>
-                <h3 className="font-medium">관련 링크</h3>
-                <ul className="space-y-1 mt-1">
-                  {restaurant.links.map((link, index) => (
-                  <li key="{index}">
-                    <a
-                      href="{link.url}"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 hover:underline"
-                    >
-                      {link.title}
-                    </a>
-                  </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            )}
-          </div>
-        </div>
-        <div className="h-full">
-          <div>
-            <h3>위치</h3>
-          </div>
-          <div>
-            <div
-              ref="{mapRef}"
-              className="w-full h-[300px] bg-gray-100 rounded-md"
-            >
-              <div
-                className="flex items-center justify-center h-full text-gray-500"
-              >
-                <p>지도를 불러오는 중입니다...</p>
-              </div>
-            </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              * 실제 구현 시 네이버 클라우드 플랫폼에서 Client ID를 발급받아
-              사용해야 합니다.
-            </p>
-          </div>
-        </div>
+      <div id="restaurant-info" class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        <!-- 식당 정보 표시 영역 -->
       </div>
 
-      <div className="mt-8">
+      <div class="mt-8">
         <div>
-          <div>
-            <h3>댓글</h3>
+          <h3>댓글</h3>
+          <div id="comments-container" class="space-y-4">
+            <!-- 댓글 목록이 여기에 동적으로 추가됩니다 -->
           </div>
-          <div>
-            <form onSubmit="{handleSubmit}" className="mb-6">
-              <textarea
-                placeholder="댓글을 작성해주세요 (익명으로 등록됩니다)"
-                value="{newComment}"
-                className="mb-3 min-h-[100px]"
-              />
-              <button type="submit" className="w-full sm:w-auto">
-                {submitting ? "등록 중..." : "댓글 등록"}
-              </button>
-            </form>
-
-            <div className="space-y-4">
-              {loading ? (
-              <div className="text-center py-4">댓글을 불러오는 중...</div>
-              ) : comments.length > 0 ? ( comments.map((comment) => (
-              <div key="{comment.id}" className="border-b pb-4 last:border-0">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium">익명</span>
-                  <span className="text-sm text-muted-foreground">
-                    {new Date(comment.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                <p className="text-gray-700">{comment.content}</p>
-              </div>
-              )) ) : (
-              <div className="text-center py-4 text-muted-foreground">
-                아직 댓글이 없습니다. 첫 댓글을 작성해보세요!
-              </div>
-              )}
-            </div>
-          </div>
+          <form id="comment-form" class="mt-4" onsubmit="submitComment(event)">
+            <textarea
+              id="comment-input"
+              placeholder="댓글을 작성해주세요 (익명으로 등록됩니다)"
+              class="mb-3 min-h-[100px] w-full border border-gray-300 rounded-md p-2"
+            ></textarea>
+            <button type="submit" class="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded-md">
+              댓글 등록
+            </button>
+          </form>
         </div>
       </div>
     </div>
