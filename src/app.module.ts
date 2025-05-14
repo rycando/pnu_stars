@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Comment } from 'src/comment/comment.entity';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { PlaceModule } from './place/place.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { join } from 'path';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'static'),
     }),
+    PlaceModule,
+    ConfigModule.forRoot({}),
   ],
   controllers: [AppController],
   providers: [AppService],
