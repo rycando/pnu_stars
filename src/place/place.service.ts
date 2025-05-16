@@ -14,8 +14,8 @@ export class PlaceService {
     const apiResponse = await this.naverAdapter.getPlaceList(params);
 
     return {
-      count: apiResponse.rss.channel.items.length,
-      places: apiResponse.rss.channel.items.map((item) => ({
+      count: apiResponse.items.length,
+      places: apiResponse.items.map((item) => ({
         title: item.title,
         description: item.description,
         link: item.link,

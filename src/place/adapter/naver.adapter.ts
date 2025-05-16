@@ -66,6 +66,6 @@ export class NaverAdapter {
         },
       );
 
-    return response.data.rss.channel.items[0];
+    return response.data.items[0];
   }
 }

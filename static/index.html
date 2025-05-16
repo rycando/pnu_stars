@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>부산대 맛집 추천</title>
+    <link rel="stylesheet" href="pnu_stars.css" />
+    <script>
+      function getPlaces() {
+        fetch('/places')
+          .then((response) => response.json())
+          .then((data) => {
+            const placesDiv = document.querySelector('.place_container');
+            const cards = data.places
+              .map((place, idx) => {
+                return `
+				<a href="/detail.html?placeName=${place.name}" class="place_link">
+          <div class="place_card" id="place_${idx}">
+            <div class="place_name">
+						  <span>${place.name}</span>
+            </div>
+            <div class="place_address"> 
+              <img src="/icons/location.png" alt="location icon" class="place_icon" />
+						  <span>${place.address}</span>
+            </div>
+            <div class="place_category">
+              <img src="/icons/category.png" alt="category icon" class="place_icon" />
+              <span class="place_category">${place.category}</span>
+            </div>
+					</div>
+				</a>
+			  `;
+              })
+              .join('\n');
+
+            placesDiv.innerHTML = cards;
+          })
+          .catch((error) => console.error('Error fetching places:', error));
+      }
+      getPlaces();
+    </script>
+  </head>
+  <body>
+    <h1>부산대 맛집 추천</h1>
+    <div class="place_container"></div>
+  </body>
+</html>

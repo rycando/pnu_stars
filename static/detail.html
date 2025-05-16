@@ -3,17 +3,20 @@
   <head>
     <link rel="stylesheet" href="pnu_stars.css" />
     <script>
-      const API_BASE_URL = "http://localhost:3000";
+      const API_BASE_URL = 'http://localhost:3000';
 
       async function fetchPlaceDetail(placeName) {
         try {
-          const response = await fetch(`${API_BASE_URL}/places/${encodeURIComponent(placeName)}`);
+          const response = await fetch(
+            `${API_BASE_URL}/places/${encodeURIComponent(placeName)}`,
+          );
           if (!response.ok) {
-            throw new Error("식당 정보 조회 실패");
+            throw new Error('식당 정보 조회 실패');
           }
 
           const data = await response.json();
-          const restaurantInfoContainer = document.getElementById("restaurant-info");
+          const restaurantInfoContainer =
+            document.getElementById('restaurant-info');
 
           restaurantInfoContainer.innerHTML = `
             <div>
@@ -27,20 +30,24 @@
           `;
         } catch (error) {
           console.error(error);
-          document.getElementById("restaurant-info").innerHTML = `<p>식당 정보를 불러오는 중 오류가 발생했습니다.</p>`;
+          document.getElementById('restaurant-info').innerHTML =
+            `<p>식당 정보를 불러오는 중 오류가 발생했습니다.</p>`;
         }
       }
 
       async function fetchComments(placeName) {
         try {
-          const response = await fetch(`${API_BASE_URL}/comments?placeName=${encodeURIComponent(placeName)}`);
+          const response = await fetch(
+            `${API_BASE_URL}/comments?placeName=${encodeURIComponent(placeName)}`,
+          );
           if (!response.ok) {
-            throw new Error("댓글 조회 실패");
+            throw new Error('댓글 조회 실패');
           }
 
           const data = await response.json();
-          const commentsContainer = document.getElementById("comments-container");
-          commentsContainer.innerHTML = "";
+          const commentsContainer =
+            document.getElementById('comments-container');
+          commentsContainer.innerHTML = '';
 
           if (data.comments.length === 0) {
             commentsContainer.innerHTML = `<p>아직 댓글이 없습니다. 첫 댓글을 작성해보세요!</p>`;
@@ -48,8 +55,8 @@
           }
 
           data.comments.forEach((comment) => {
-            const commentElement = document.createElement("div");
-            commentElement.className = "comment-item";
+            const commentElement = document.createElement('div');
+            commentElement.className = 'comment-item';
             commentElement.innerHTML = `
               <p><strong>${comment.placeName}</strong></p>
               <p>${comment.content}</p>
@@ -59,46 +66,56 @@
           });
         } catch (error) {
           console.error(error);
-          document.getElementById("comments-container").innerHTML = `<p>댓글을 불러오는 중 오류가 발생했습니다.</p>`;
+          document.getElementById('comments-container').innerHTML =
+            `<p>댓글을 불러오는 중 오류가 발생했습니다.</p>`;
         }
       }
 
       async function submitComment(event) {
         event.preventDefault();
-        const placeName = new URLSearchParams(window.location.search).get("placeName");
-        const content = document.getElementById("comment-input").value;
+        const placeName = new URLSearchParams(window.location.search).get(
+          'placeName',
+        );
+        const content = document.getElementById('comment-input').value;
 
         if (!content.trim()) {
-          alert("댓글 내용을 입력해주세요.");
+          alert('댓글 내용을 입력해주세요.');
           return;
         }
 
         try {
-          const response = await fetch(`${API_BASE_URL}/comments/${encodeURIComponent(placeName)}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
+          const response = await fetch(
+            `${API_BASE_URL}/comments/${encodeURIComponent(placeName)}`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ content }),
             },
-            body: JSON.stringify({ content }),
-          });
+          );
 
           if (!response.ok) {
-            throw new Error("댓글 등록 실패");
+            throw new Error('댓글 등록 실패');
           }
 
-          document.getElementById("comment-input").value = "";
+          document.getElementById('comment-input').value = '';
           fetchComments(placeName);
         } catch (error) {
           console.error(error);
-          alert("댓글 등록 중 오류가 발생했습니다.");
+          alert('댓글 등록 중 오류가 발생했습니다.');
         }
       }
 
       window.onload = function () {
-        const placeName = new URLSearchParams(window.location.search).get("placeName");
+        const placeName = new URLSearchParams(window.location.search).get(
+          'placeName',
+        );
         if (!placeName) {
-          document.getElementById("restaurant-info").innerHTML = `<p>식당 정보를 찾을 수 없습니다.</p>`;
-          document.getElementById("comments-container").innerHTML = `<p>댓글을 불러올 수 없습니다.</p>`;
+          document.getElementById('restaurant-info').innerHTML =
+            `<p>식당 정보를 찾을 수 없습니다.</p>`;
+          document.getElementById('comments-container').innerHTML =
+            `<p>댓글을 불러올 수 없습니다.</p>`;
           return;
         }
 
@@ -110,12 +127,18 @@
   <body>
     <div class="container mx-auto px-4 py-8">
       <div class="mb-6">
-        <a href="index.html" style="display: inline-flex; align-items: center; gap: 0.25rem">
+        <a
+          href="/index.html"
+          style="display: inline-flex; align-items: center; gap: 0.25rem"
+        >
           <span>메인으로 돌아가기</span>
         </a>
       </div>
 
-      <div id="restaurant-info" class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+      <div
+        id="restaurant-info"
+        class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"
+      >
         <!-- 식당 정보 표시 영역 -->
       </div>
 
@@ -131,7 +154,10 @@
               placeholder="댓글을 작성해주세요 (익명으로 등록됩니다)"
               class="mb-3 min-h-[100px] w-full border border-gray-300 rounded-md p-2"
             ></textarea>
-            <button type="submit" class="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded-md">
+            <button
+              type="submit"
+              class="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded-md"
+            >
               댓글 등록
             </button>
           </form>

@@ -8,6 +8,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PlaceModule } from './place/place.module';
 import { ConfigModule } from '@nestjs/config';
+import naverConfig from 'src/config/naver.config';
 
 @Module({
   imports: [
@@ -26,7 +27,9 @@ import { ConfigModule } from '@nestjs/config';
       rootPath: join(__dirname, '..', 'static'),
     }),
     PlaceModule,
-    ConfigModule.forRoot({}),
+    ConfigModule.forRoot({
+      load: [naverConfig],
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
